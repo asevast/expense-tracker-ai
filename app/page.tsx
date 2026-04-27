@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useExpenses } from "@/app/context/ExpenseContext";
 import { StatsCard } from "@/app/components/Dashboard/StatsCard";
 import { SpendingChart } from "@/app/components/Dashboard/SpendingChart";
@@ -7,6 +8,7 @@ import { CategoryBreakdown } from "@/app/components/Dashboard/CategoryBreakdown"
 import { FilterBar } from "@/app/components/Filters/FilterBar";
 import { ExpenseTable } from "@/app/components/ExpenseList/ExpenseTable";
 import { Card } from "@/app/components/ui/Card";
+import { Button } from "@/app/components/ui/Button";
 import {
   DollarSign,
   Receipt,
@@ -14,13 +16,16 @@ import {
   BarChart3,
   ArrowUp,
   ArrowDown,
+  Download,
 } from "lucide-react";
 import { formatCurrency, formatSignedCurrency } from "@/app/lib/utils";
+import { ExportModal } from "@/app/components/Exports/ExportModal";
 
 export default function HomePage() {
   const { getDashboardStats, getFilteredExpenses } = useExpenses();
   const stats = getDashboardStats();
   const filteredExpenses = getFilteredExpenses();
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   const transactionCount = filteredExpenses.length;
   const totalIncome = stats.totalIncome;
@@ -33,10 +38,18 @@ export default function HomePage() {
     <div className="min-h-screen bg-primary-50">
       <div className="border-b border-primary-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-primary-900">Expense Tracker</h1>
-          <p className="mt-2 text-primary-600">
-            Track, categorize, and analyze your expenses and income
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-primary-900">Expense Tracker</h1>
+              <p className="mt-2 text-primary-600">
+                Track, categorize, and analyze your expenses and income
+              </p>
+            </div>
+            <Button onClick={() => setIsExportOpen(true)} className="gap-2">
+              <Download className="h-4 w-4" />
+              Export Data
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -90,6 +103,8 @@ export default function HomePage() {
           </p>
         </div>
       </footer>
+
+      <ExportModal isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} />
     </div>
   );
 }

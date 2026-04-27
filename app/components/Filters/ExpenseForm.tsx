@@ -6,7 +6,7 @@ import { Modal } from "@/app/components/ui/Modal";
 import { Input } from "@/app/components/ui/Input";
 import { Select } from "@/app/components/ui/Select";
 import { Button } from "@/app/components/ui/Button";
-import { CATEGORIES, TRANSACTION_TYPES, CURRENCIES, Expense, TransactionType } from "@/app/types";
+import { CATEGORIES, TRANSACTION_TYPES, CURRENCIES, Currency, Category, Expense, TransactionType } from "@/app/types";
 
 interface ExpenseFormProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
     amount: "",
     type: "expense" as TransactionType,
     currency: "USD" as Currency,
-    category: "Food",
+    category: "Food" as Category,
     description: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -42,7 +42,7 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
         amount: "",
         type: "expense",
         currency: "USD",
-        category: "Food",
+        category: "Food" as Category,
         description: "",
       });
     }
@@ -165,7 +165,7 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
         <Select
           label="Category"
           value={formData.category}
-          onChange={(e) => handleChange("category", e.target.value)}
+          onChange={(e) => handleChange("category", e.target.value as Category)}
           options={availableCategories.map((cat) => ({ value: cat.value, label: cat.label }))}
           error={errors.category}
         />
