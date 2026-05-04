@@ -8,6 +8,14 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Expense Tracker AI",
   description: "Track your expenses smartly with AI-powered insights",
+  manifest: "/manifest.json",
+  themeColor: "#0f172a",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ExpenseAI",
+  },
 };
 
 export default function RootLayout({
