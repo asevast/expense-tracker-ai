@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ExpenseProvider } from "@/app/context/ExpenseContext";
+import { AIProvider } from "@/app/context/AIContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ExpenseProvider>{children}</ExpenseProvider>
+        <AIProvider>
+          <ExpenseProvider>{children}</ExpenseProvider>
+        </AIProvider>
       </body>
     </html>
   );
