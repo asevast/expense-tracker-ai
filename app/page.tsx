@@ -17,15 +17,18 @@ import {
   ArrowUp,
   ArrowDown,
   Download,
+  Settings,
 } from "lucide-react";
 import { formatCurrency, formatSignedCurrency } from "@/app/lib/utils";
 import { ExportModal } from "@/app/components/Exports/ExportModal";
+import { AISettingsModal } from "@/app/components/Settings/AISettingsModal";
 
 export default function HomePage() {
   const { getDashboardStats, getFilteredExpenses } = useExpenses();
   const stats = getDashboardStats();
   const filteredExpenses = getFilteredExpenses();
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const transactionCount = filteredExpenses.length;
   const totalIncome = stats.totalIncome;
@@ -45,10 +48,20 @@ export default function HomePage() {
                 Track, categorize, and analyze your expenses and income
               </p>
             </div>
-            <Button onClick={() => setIsExportOpen(true)} className="gap-2">
-              <Download className="h-4 w-4" />
-              Export Data
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setIsSettingsOpen(true)}
+                className="gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                AI Settings
+              </Button>
+              <Button onClick={() => setIsExportOpen(true)} className="gap-2">
+                <Download className="h-4 w-4" />
+                Export Data
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -105,6 +118,7 @@ export default function HomePage() {
       </footer>
 
       <ExportModal isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} />
+      <AISettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }
