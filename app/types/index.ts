@@ -62,15 +62,15 @@ export interface DashboardStats {
   categoryTotals: Record<Category, number>;
   typeTotals: Record<TransactionType, number>;
   monthlyData: { month: string; income: number; expenses: number }[];
-  }
+}
 
-  export type AIProviderType = "openai" | "anthropic" | "local" | "openrouter";
+export type AIProviderType = "openai" | "anthropic" | "local" | "openrouter";
 
-  export interface AIConfig {
+export interface AIConfig {
   enabled: boolean;
   provider: AIProviderType;
   baseUrl: string;
   apiKey: string;
   modelId: string;
-  }
+}
 
