@@ -22,6 +22,7 @@ import {
 import { formatCurrency, formatSignedCurrency } from "@/app/lib/utils";
 import { ExportModal } from "@/app/components/Exports/ExportModal";
 import { AISettingsModal } from "@/app/components/Settings/AISettingsModal";
+import { AIInsights } from "@/app/components/Dashboard/AIInsights";
 
 export default function HomePage() {
   const { getDashboardStats, getFilteredExpenses } = useExpenses();
@@ -90,6 +91,8 @@ export default function HomePage() {
               icon={<Receipt className="h-6 w-6" />}
             />
           </div>
+
+          <AIInsights />
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
