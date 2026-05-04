@@ -7,6 +7,7 @@ import { Input } from "@/app/components/ui/Input";
 import { Select } from "@/app/components/ui/Select";
 import { Button } from "@/app/components/ui/Button";
 import { CATEGORIES, TRANSACTION_TYPES, CURRENCIES, Currency, Category, Expense, TransactionType } from "@/app/types";
+import { useCategorySuggestion } from "@/app/hooks/useCategorySuggestion";
 
 interface ExpenseFormProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
     description: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const { suggestion, isLoading } = useCategorySuggestion(formData.description, formData.type);
 
   useEffect(() => {
     if (expense) {
@@ -162,13 +165,31 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
           />
         </div>
 
-        <Select
-          label="Category"
-          value={formData.category}
-          onChange={(e) => handleChange("category", e.target.value as Category)}
-          options={availableCategories.map((cat) => ({ value: cat.value, label: cat.label }))}
-          error={errors.category}
-        />
+        <div className="space-y-1">
+          <Select
+            label="Category"
+            value={formData.category}
+            onChange={(e) => handleChange("category", e.target.value as Category)}
+            options={availableCategories.map((cat) => ({ value: cat.value, label: cat.label }))}
+            error={errors.category}
+          />
+          {(suggestion || isLoading) && (
+            <div className="flex items-center gap-2 px-1 text-sm animate-in fade-in slide-in-from-top-1">
+              <span className="text-gray-500">
+                {isLoading ? "AI is thinking..." : "Suggested:"}
+              </span>
+              {suggestion && suggestion !== formData.category && !isLoading && (
+                <button
+                  type="button"
+                  onClick={() => handleChange("category", suggestion)}
+                  className="px-2 py-0.5 bg-primary/10 text-primary rounded-full border border-primary/20 hover:bg-primary/20 transition-colors text-xs font-medium"
+                >
+                  {suggestion}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
         <Input
           label="Description"
