@@ -2,82 +2,41 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Status
+## Project Overview
 
-This is a **new/fresh repository** with no existing codebase. The project is an "expense-tracker-ai" application that will track expenses with AI capabilities.
+A Next.js 14 expense tracker with AI capabilities. Tracks income/expenses with multi-currency support (USD, RUB), localStorage persistence, and cloud export features.
 
-## Recommended Development Setup
-
-### Language & Framework Recommendations
-
-Consider one of these stacks based on your requirements:
-
-- **Python**: FastAPI/Flask for backend, PostgreSQL for storage, AI integration via Anthropic/OpenAI APIs
-- **TypeScript/Node.js**: Express/Fastify for backend, PostgreSQL/Prisma ORM, AI SDK integrations
-- **Full-stack**: Add React/Vue.js frontend for user interface
-
-### Common Commands (To Be Implemented)
-
-Once the project is initialized, add these standard commands:
+## Common Commands
 
 ```bash
-# Setup
-poetry install              # or: pip install -r requirements.txt
-# or: npm install
-
-# Development
-poetry run uvicorn app:app --reload   # Python FastAPI
-# or: npm run dev
-
-# Testing
-pytest tests/              # Python
-# or: npm test
-
-# Linting
-ruff check .               # Python
-# or: npm run lint
-
-# Database
-alembic upgrade head       # migrations (Python)
-# or: npx prisma migrate dev
+npm run dev      # Start development server
+npm run build    # Production build
+npm start        # Start production server
+npm run lint     # Lint code
 ```
 
-### Directory Structure (Recommended)
+## Architecture
 
-```
-expense-tracker-ai/
-├── src/            # Application code
-│   ├── api/       # API endpoints/handlers
-│   ├── models/    # Data models/schemas
-│   ├── services/  # Business logic (expense categorization, AI processing)
-│   ├── database/  # DB connection, migrations
-│   └── utils/     # Utilities
-├── tests/         # Unit and integration tests
-├── .env.example   # Environment variable template
-├── pyproject.toml # Python dependencies (or package.json)
-└── README.md      # Project documentation
-```
+**State Management**: React Context (`ExpenseContext`) with `useLocalStorage` hook for persistence. All expense data lives in localStorage under `expenses` key.
 
-## Architecture Guidelines
+**Data Flow**: `app/types/index.ts` defines all types (Expense, FilterState, DashboardStats, Category, Currency). Context exposes CRUD operations and computed stats (filtered results, totals, category breakdowns, monthly trends).
 
-Once the project structure is defined, update this file with:
-- Exact build/lint/test commands
-- Database setup and migration instructions
-- AI service configuration (Anthropic API keys, prompts)
-- Expense categorization logic location
-- Receipt parsing (OCR) details if applicable
+**Component Structure**:
+- `app/context/ExpenseContext.tsx` — Global state provider
+- `app/components/ui/` — Reusable UI primitives (Button, Input, Select, Modal, Card)
+- `app/components/Dashboard/` — StatsCard, SpendingChart, CategoryBreakdown
+- `app/components/Filters/` — FilterBar, ExpenseForm
+- `app/components/ExpenseList/` — ExpenseTable, ExpenseRow
+- `app/components/CloudExport/` — Multi-tab export modal (email, Google Sheets, backup schedules, sharing)
 
-## Key Considerations for Expense Tracker AI
+**Utilities**:
+- `app/lib/utils.ts` — formatCurrency, formatDate, cn (classname merge)
+- `app/lib/csv.ts` — CSV generation and download
 
-1. **AI Integration**: Expect to use Claude API for categorizing expenses, extracting data from receipts, or providing insights
-2. **Data Privacy**: Expense data is sensitive—ensure proper security and encryption
-3. **Multi-format Support**: Receipts come as images, PDFs, or text—plan for OCR capabilities
-4. **Currency & Locale**: Support multiple currencies and date formats
-5. **Category Management**: Flexible categorization with AI-assisted suggestions
+**Styling**: Tailwind with custom `primary` color palette (slate-based). Uses `clsx` + `tailwind-merge` via `cn()` utility for conditional classes.
 
-## Notes for Claude Code
+## Key Patterns
 
-- The user may be in early planning or implementation phase
-- Look for README.md, pyproject.toml, package.json for actual commands
-- If no files exist yet, ask the user about preferred stack and features
-- Update this file as the project matures with real commands and structure
+- Filters are stored in localStorage under `filters` key; filter logic lives in `getFilteredExpenses()`
+- Dashboard stats are computed from filtered expenses via `getDashboardStats()`
+- CloudExportModal is a large multi-tab component (~1000 lines) handling simulated export workflows

@@ -1,0 +1,60 @@
+<h2>AI Feature Integration</h2>
+<p class="subtitle">How AI will help the user manage expenses</p>
+
+<div class="mockup">
+  <div class="mockup-header">Add Expense Form</div>
+  <div class="mockup-body">
+    <div style="padding: 15px; background: #fff;">
+      <label class="label">Description</label>
+      <input class="mock-input" value="Uber to the airport" style="width: 100%;">
+      
+      <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 12px; color: #6b7280;">AI Suggestion:</span>
+        <button class="mock-button" style="padding: 2px 8px; font-size: 12px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; border-radius: 12px;">
+          Transportation
+        </button>
+      </div>
+
+      <label class="label" style="margin-top: 15px; display: block;">Category</label>
+      <select class="mock-input" style="width: 100%;"><option>Transportation</option></select>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Dashboard > AI Insights</div>
+  <div class="mockup-body">
+    <div style="padding: 15px; background: #fdf2f2; border-left: 4px solid #ef4444;">
+      <h4 style="color: #991b1b; margin: 0;">Spending Alert</h4>
+      <p style="font-size: 14px; color: #b91c1c; margin: 4px 0 0;">
+        "Your <strong>Food</strong> spending is 20% higher than last month. Most of this is from late-night deliveries."
+      </p>
+    </div>
+    <div style="padding: 15px; background: #f0fdf4; border-left: 4px solid #22c55e; margin-top: 10px;">
+      <h4 style="color: #166534; margin: 0;">Savings Opportunity</h4>
+      <p style="font-size: 14px; color: #15803d; margin: 4px 0 0;">
+        "You've spent $45 on <strong>Subscriptions</strong> this month. You have two overlapping streaming services."
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>Implementation Details</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Smart Logic</h4>
+      <ul>
+        <li><strong>Contextual Prompts:</strong> We'll send the list of existing <code>CATEGORIES</code> to the AI to ensure it picks a valid one.</li>
+        <li><strong>Privacy-First Insights:</strong> Data is summarized locally before being sent to the LLM (e.g., "Food: $500, 10 transactions" instead of sending every single line item).</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Handling Failures</h4>
+      <ul>
+        <li><strong>Graceful Degradation:</strong> If the AI key is missing or the provider is down, the app works perfectly as a standard manual tracker.</li>
+        <li><strong>Debounced Calls:</strong> Categorization only fires after the user stops typing to save tokens.</li>
+      </ul>
+    </div>
+  </div>
+</div>
