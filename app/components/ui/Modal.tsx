@@ -41,12 +41,16 @@ export function Modal({ isOpen, onClose, title, children, size = "md" }: ModalPr
             "max-w-2xl": size === "lg",
           }
         )}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-primary-900">{title}</h2>
+          <h2 id="modal-title" className="text-xl font-semibold text-primary-900">{title}</h2>
           <button
             onClick={onClose}
             className="rounded-md text-primary-500 hover:bg-primary-100 p-1 transition-colors"
+            aria-label="Close modal"
           >
             <X className="h-5 w-5" />
           </button>
