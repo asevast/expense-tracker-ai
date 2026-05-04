@@ -78,16 +78,9 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
         { role: "user", content: "Say 'Success'" },
       ]);
       
-      let message = "";
-      if (formData.provider === "anthropic") {
-        message = response.content[0].text;
-      } else {
-        message = response.choices[0].message.content;
-      }
-
       setTestResult({
         success: true,
-        message: `Connection successful: ${message}`,
+        message: `Connection successful: ${response.content}`,
       });
     } catch (error: any) {
       setTestResult({

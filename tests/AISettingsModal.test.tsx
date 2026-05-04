@@ -73,7 +73,7 @@ describe('AISettingsModal', () => {
 
   it('tests connection successfully', async () => {
     (callAI as any).mockResolvedValueOnce({
-      choices: [{ message: { content: 'Success' } }]
+      content: 'Success'
     });
 
     render(<AISettingsModal isOpen={true} onClose={mockOnClose} />);

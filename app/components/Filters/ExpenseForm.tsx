@@ -27,7 +27,11 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { suggestion, isLoading } = useCategorySuggestion(formData.description, formData.type);
+  const { suggestion, isLoading } = useCategorySuggestion(
+    formData.description, 
+    formData.type,
+    formData.category
+  );
 
   useEffect(() => {
     if (expense) {
@@ -175,18 +179,20 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
           />
           {(suggestion || isLoading) && (
             <div className="flex items-center gap-2 px-1 text-sm animate-in fade-in slide-in-from-top-1">
-              <span className="text-gray-500">
-                {isLoading ? "AI is thinking..." : "Suggested:"}
-              </span>
-              {suggestion && suggestion !== formData.category && !isLoading && (
-                <button
-                  type="button"
-                  onClick={() => handleChange("category", suggestion)}
-                  className="px-2 py-0.5 bg-primary/10 text-primary rounded-full border border-primary/20 hover:bg-primary/20 transition-colors text-xs font-medium"
-                >
-                  {suggestion}
-                </button>
-              )}
+              {isLoading ? (
+                <span className="text-gray-500">AI is thinking...</span>
+              ) : suggestion ? (
+                <>
+                  <span className="text-gray-500">Suggested:</span>
+                  <button
+                    type="button"
+                    onClick={() => handleChange("category", suggestion)}
+                    className="px-2 py-0.5 bg-primary/10 text-primary rounded-full border border-primary/20 hover:bg-primary/20 transition-colors text-xs font-medium"
+                  >
+                    {suggestion}
+                  </button>
+                </>
+              ) : null}
             </div>
           )}
         </div>

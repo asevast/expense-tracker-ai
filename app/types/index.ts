@@ -74,3 +74,8 @@ export interface AIConfig {
   modelId: string;
 }
 
+export interface AIMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+

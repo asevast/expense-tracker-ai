@@ -107,4 +107,55 @@ describe('AIInsights', () => {
       expect(screen.getByText('API error')).toBeDefined();
     });
   });
+
+  it('parses bullet points and renders them as list items', async () => {
+    const bulletedResponse = "* Insight one\n- Insight two\n1. Insight three";
+    (callAI as any).mockResolvedValue({ content: bulletedResponse });
+
+    render(<AIInsights />);
+    const button = screen.getByText('Analyze Spending');
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByText('Insight one')).toBeDefined();
+      expect(screen.getByText('Insight two')).toBeDefined();
+      expect(screen.getByText('Insight three')).toBeDefined();
+      const listItems = screen.getAllByRole('listitem');
+      expect(listItems).toHaveLength(3);
+    });
+  });
+
+  it('includes up to 5 categories in the summary', async () => {
+    const manyStats = {
+      totalIncome: 5000,
+      totalExpenses: 3000,
+      netBalance: 2000,
+      categoryTotals: {
+        Cat1: 100,
+        Cat2: 200,
+        Cat3: 300,
+        Cat4: 400,
+        Cat5: 500,
+        Cat6: 600,
+      },
+    };
+    (useExpenses as any).mockReturnValue({
+      getDashboardStats: () => manyStats,
+    });
+    (callAI as any).mockResolvedValue({ content: 'Done' });
+
+    render(<AIInsights />);
+    fireEvent.click(screen.getByText('Analyze Spending'));
+
+    await waitFor(() => {
+      const call = (callAI as any).mock.calls[0];
+      const userMessage = call[1].find((m: any) => m.role === 'user').content;
+      expect(userMessage).toContain('Cat6: $600.00');
+      expect(userMessage).toContain('Cat5: $500.00');
+      expect(userMessage).toContain('Cat4: $400.00');
+      expect(userMessage).toContain('Cat3: $300.00');
+      expect(userMessage).toContain('Cat2: $200.00');
+      expect(userMessage).not.toContain('Cat1: $100.00');
+    });
+  });
 });

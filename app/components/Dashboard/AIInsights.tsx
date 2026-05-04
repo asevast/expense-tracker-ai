@@ -22,7 +22,7 @@ export function AIInsights() {
     const topCategories = Object.entries(stats.categoryTotals)
       .filter(([_, total]) => total > 0)
       .sort(([_, a], [__, b]) => b - a)
-      .slice(0, 3)
+      .slice(0, 5)
       .map(([cat, total]) => `${cat}: ${formatCurrency(total)}`)
       .join(", ");
 
@@ -88,9 +88,18 @@ export function AIInsights() {
       )}
 
       {insights ? (
-        <div className="prose prose-sm max-w-none text-primary-700">
-          <div dangerouslySetInnerHTML={{ __html: insights.replace(/\n/g, '<br />') }} />
-        </div>
+        <ul className="space-y-2 list-disc list-outside ml-4 text-sm text-primary-700">
+          {insights
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0)
+            .map((line) => line.replace(/^[*+-]\s*/, "").replace(/^\d+\.\s*/, ""))
+            .map((insight, index) => (
+              <li key={index} className="pl-1">
+                {insight}
+              </li>
+            ))}
+        </ul>
       ) : (
         !isLoading && (
           <p className="text-sm text-primary-600 italic">

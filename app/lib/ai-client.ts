@@ -1,6 +1,6 @@
-import { AIConfig } from '@/app/types';
+import { AIConfig, AIMessage } from '@/app/types';
 
-export async function callAI(config: AIConfig, messages: any[]) {
+export async function callAI(config: AIConfig, messages: AIMessage[]) {
   const isAnthropic = config.provider === 'anthropic';
   const isOpenRouter = config.provider === 'openrouter';
   const useProxy = isAnthropic || isOpenRouter;
@@ -15,10 +15,16 @@ export async function callAI(config: AIConfig, messages: any[]) {
     url = 'https://api.anthropic.com/v1/messages';
     headers['x-api-key'] = config.apiKey;
     headers['anthropic-version'] = '2023-06-01';
+    
+    // Anthropic handles system messages as a top-level parameter
+    const systemMessage = messages.find(m => m.role === 'system');
+    const userMessages = messages.filter(m => m.role !== 'system');
+    
     body = {
       model: config.modelId,
-      messages,
+      messages: userMessages,
       max_tokens: 1024,
+      ...(systemMessage && { system: systemMessage.content })
     };
   } else {
     url = `${config.baseUrl}/chat/completions`;
@@ -42,5 +48,20 @@ export async function callAI(config: AIConfig, messages: any[]) {
     throw new Error(errorData.error?.message || errorData.error || `AI API call failed with status ${response.status}`);
   }
 
-  return response.json();
+  const result = await response.json();
+  
+  // Normalize response
+  if (isAnthropic) {
+    const text = result.content?.[0]?.text;
+    if (typeof text !== 'string') {
+      throw new Error('Invalid AI response format: missing content text');
+    }
+    return { content: text };
+  } else {
+    const content = result.choices?.[0]?.message?.content;
+    if (typeof content !== 'string') {
+      throw new Error('Invalid AI response format: missing choices content');
+    }
+    return { content };
+  }
 }
