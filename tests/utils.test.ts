@@ -15,6 +15,18 @@ describe('formatCurrency', () => {
     expect(result).to.include('000')
     expect(result).to.include('₽')
   })
+
+  it('respects language for USD formatting', () => {
+    // In Russian locale, $ might be placed after the number
+    const result = formatCurrency(100, 'USD', 'ru')
+    expect(result).to.include('100,00')
+    expect(result).to.include('$')
+  })
+
+  it('respects language for RUB formatting', () => {
+    const result = formatCurrency(1000, 'RUB', 'en')
+    expect(result).toBe('RUB 1,000.00') // en-US uses RUB code instead of symbol for RUB currency sometimes, or symbols
+  })
 })
 
 describe('formatSignedCurrency', () => {
@@ -29,6 +41,13 @@ describe('formatSignedCurrency', () => {
     expect(result[0]).toBe('-')
     expect(result).to.include('$200.00')
   })
+
+  it('prevents double-sign issues with negative amounts', () => {
+    // If amount is negative, it should still only have one sign prefix
+    const result = formatSignedCurrency(-100, 'expense', 'USD')
+    expect(result).toBe('-$100.00')
+    expect(result).not.to.include('--')
+  })
 })
 
 describe('formatDate', () => {
@@ -37,6 +56,15 @@ describe('formatDate', () => {
     expect(result).to.include('15')
     expect(result).to.include('2024')
   })
+
+  it('respects language for date formatting', () => {
+    const result = formatDate('2024-03-15', 'ru')
+    // Russian format is typically DD.MM.YYYY or similar, and month might be in Russian
+    expect(result).to.include('15')
+    expect(result).to.include('2024')
+    // 03 is March, in Russian (genitive) it's "марта"
+    expect(result).to.match(/мар/i)
+  })
 })
 
 describe('formatMonthYear', () => {
@@ -44,6 +72,12 @@ describe('formatMonthYear', () => {
     const result = formatMonthYear('2024-03')
     expect(result).to.include('March')
     expect(result).to.include('2024')
+  })
+
+  it('respects language for month-year formatting', () => {
+    const result = formatMonthYear('2024-03', 'ru')
+    expect(result).to.include('2024')
+    expect(result).to.match(/март/i)
   })
 })
 
