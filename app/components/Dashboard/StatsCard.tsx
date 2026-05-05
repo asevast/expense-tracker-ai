@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { Card } from "@/app/components/ui/Card";
 import { cn } from "@/app/lib/utils";
+import { useTranslation } from "@/app/context/LanguageContext";
 
 interface StatsCardProps {
   title: string;
@@ -16,6 +17,8 @@ interface StatsCardProps {
 }
 
 export function StatsCard({ title, value, icon, trend, className }: StatsCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card className={cn("flex items-center gap-4", className)}>
       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
@@ -32,7 +35,7 @@ export function StatsCard({ title, value, icon, trend, className }: StatsCardPro
             )}
           >
             {trend.isPositive ? "+" : "-"}
-            {trend.value}% from last month
+            {trend.value}% {t('fromLastMonth')}
           </p>
         )}
       </div>

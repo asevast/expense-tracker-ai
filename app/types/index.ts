@@ -1,6 +1,6 @@
 export const TRANSACTION_TYPES = [
-  { value: "expense", label: "Expense", color: "#ef4444" },
-  { value: "income", label: "Income", color: "#10b981" },
+  { value: "expense", label: "Expense", labelRu: "Расход", color: "#ef4444" },
+  { value: "income", label: "Income", labelRu: "Доход", color: "#10b981" },
 ] as const;
 
 export type TransactionType = (typeof TRANSACTION_TYPES)[number]["value"];
@@ -12,20 +12,22 @@ export const CURRENCIES = [
 
 export type Currency = (typeof CURRENCIES)[number]["value"];
 
+export type Language = 'en' | 'ru';
+
 export const CATEGORIES = [
   // Income categories
-  { value: "Salary", label: "Salary", color: "#10b981", type: "income" as TransactionType },
-  { value: "Freelance", label: "Freelance", color: "#14b8a6", type: "income" as TransactionType },
-  { value: "Investment", label: "Investment", color: "#06b6d4", type: "income" as TransactionType },
-  { value: "Gift", label: "Gift", color: "#0ea5e9", type: "income" as TransactionType },
-  { value: "Other Income", label: "Other Income", color: "#84cc16", type: "income" as TransactionType },
+  { value: "Salary", label: "Salary", labelRu: "Зарплата", color: "#10b981", type: "income" as TransactionType },
+  { value: "Freelance", label: "Freelance", labelRu: "Фриланс", color: "#14b8a6", type: "income" as TransactionType },
+  { value: "Investment", label: "Investment", labelRu: "Инвестиции", color: "#06b6d4", type: "income" as TransactionType },
+  { value: "Gift", label: "Gift", labelRu: "Подарок", color: "#0ea5e9", type: "income" as TransactionType },
+  { value: "Other Income", label: "Other Income", labelRu: "Прочий доход", color: "#84cc16", type: "income" as TransactionType },
   // Expense categories
-  { value: "Food", label: "Food", color: "#ef4444", type: "expense" as TransactionType },
-  { value: "Transportation", label: "Transportation", color: "#f97316", type: "expense" as TransactionType },
-  { value: "Entertainment", label: "Entertainment", color: "#eab308", type: "expense" as TransactionType },
-  { value: "Shopping", label: "Shopping", color: "#3b82f6", type: "expense" as TransactionType },
-  { value: "Bills", label: "Bills", color: "#8b5cf6", type: "expense" as TransactionType },
-  { value: "Other", label: "Other", color: "#6b7280", type: "expense" as TransactionType },
+  { value: "Food", label: "Food", labelRu: "Еда", color: "#ef4444", type: "expense" as TransactionType },
+  { value: "Transportation", label: "Transportation", labelRu: "Транспорт", color: "#f97316", type: "expense" as TransactionType },
+  { value: "Entertainment", label: "Entertainment", labelRu: "Развлечения", color: "#eab308", type: "expense" as TransactionType },
+  { value: "Shopping", label: "Shopping", labelRu: "Покупки", color: "#3b82f6", type: "expense" as TransactionType },
+  { value: "Bills", label: "Bills", labelRu: "Счета", color: "#8b5cf6", type: "expense" as TransactionType },
+  { value: "Other", label: "Other", labelRu: "Прочее", color: "#6b7280", type: "expense" as TransactionType },
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number]["value"];
@@ -63,3 +65,19 @@ export interface DashboardStats {
   typeTotals: Record<TransactionType, number>;
   monthlyData: { month: string; income: number; expenses: number }[];
 }
+
+export type AIProviderType = "openai" | "anthropic" | "local" | "openrouter";
+
+export interface AIConfig {
+  enabled: boolean;
+  provider: AIProviderType;
+  baseUrl: string;
+  apiKey: string;
+  modelId: string;
+}
+
+export interface AIMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+

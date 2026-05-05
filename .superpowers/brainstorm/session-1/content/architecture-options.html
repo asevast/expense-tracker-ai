@@ -1,0 +1,53 @@
+<h2>Production Plan: PWA + AI</h2>
+<p class="subtitle">Choosing the right architecture for an "ASAP" deployment</p>
+
+<div class="options">
+  <div class="option" data-choice="byok" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Bring Your Own Key (BYOK)</h3>
+      <p>Users provide their own Anthropic/OpenAI API key. Key is stored locally in the browser.</p>
+      <ul>
+        <li><strong>Privacy:</strong> Highest. No data ever leaves the device except to the AI provider.</li>
+        <li><strong>Cost:</strong> Zero for you. Users pay for their own usage.</li>
+        <li><strong>Speed:</strong> Fastest to deploy (no backend setup).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="option" data-choice="edge" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Edge Functions (Managed)</h3>
+      <p>Small proxy functions (Vercel/Netlify) handle AI calls and hide your master API key.</p>
+      <ul>
+        <li><strong>UX:</strong> Seamless. Users don't need to know about API keys.</li>
+        <li><strong>Cost:</strong> You pay for the AI tokens. Requires usage limits/auth to prevent abuse.</li>
+        <li><strong>Setup:</strong> Slightly more complex (deployment secrets, routing).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Plus: Standard PWA Features</h3>
+  <div class="cards">
+    <div class="card">
+      <div class="card-body">
+        <h4>Manifest & Icons</h4>
+        <p>Make the app installable on iOS/Android home screens.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4>Offline Support</h4>
+        <p>Basic service worker to ensure the app loads without internet.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4>Web Share Target</h4>
+        <p>Allows sharing receipt images or text directly to the app.</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,11 +1,12 @@
 "use client";
 
-import { Expense } from "@/app/types";
+import { Expense, CATEGORIES } from "@/app/types";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
 import { Edit2, Trash2 } from "lucide-react";
 import { formatDate, formatSignedCurrency, cn } from "@/app/lib/utils";
 import { useExpenses } from "@/app/context/ExpenseContext";
+import { useTranslation } from "@/app/context/LanguageContext";
 
 interface ExpenseRowProps {
   expense: Expense;
@@ -14,10 +15,11 @@ interface ExpenseRowProps {
 
 export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
   const { deleteExpense, getCategoryColor } = useExpenses();
+  const { language, t } = useTranslation();
   const color = getCategoryColor(expense.category);
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this expense?")) {
+    if (window.confirm(t('deleteConfirm'))) {
       deleteExpense(expense.id);
     }
   };
@@ -28,7 +30,7 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
   return (
     <div className="grid grid-cols-1 gap-4 items-center border-b border-primary-100 p-4 hover:bg-primary-50/50 transition-colors sm:grid-cols-12">
       <div className="sm:col-span-2">
-        <span className="text-sm font-medium text-primary-900">{formatDate(expense.date)}</span>
+        <span className="text-sm font-medium text-primary-900">{formatDate(expense.date, language)}</span>
       </div>
       <div className="sm:col-span-2">
         <span className="inline-flex items-center gap-2">
@@ -36,7 +38,7 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
             className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${typeColor} bg-opacity-10`}
             style={{ backgroundColor: expense.type === "income" ? "#10b98120" : "#ef444420" }}
           >
-            {expense.type === "income" ? "↑ Income" : "↓ Expense"}
+            {expense.type === "income" ? `↑ ${t('incomeIndicator')}` : `↓ ${t('expenseIndicator')}`}
           </span>
           <span className="text-xs text-primary-500">{expense.currency}</span>
         </span>
@@ -46,12 +48,12 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
           className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
           style={{ backgroundColor: `${color}20`, color }}
         >
-          {expense.category}
+          {language === 'ru' ? (CATEGORIES.find(c => c.value === expense.category)?.labelRu || expense.category) : expense.category}
         </span>
       </div>
       <div className="sm:col-span-2">
         <span className={`font-semibold ${amountColor}`}>
-          {formatSignedCurrency(expense.amount, expense.type, expense.currency)}
+          {formatSignedCurrency(expense.amount, expense.type, expense.currency, language)}
         </span>
       </div>
       <div className="sm:col-span-3">
