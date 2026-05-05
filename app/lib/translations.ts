@@ -130,6 +130,7 @@ export const translations = {
     cancel: "Отмена",
     analyze: "Анализировать расходы",
     aiInsights: "AI Аналитика",
+    aiInsightError: "Не удалось получить аналитику",
     noData: "Транзакции не найдены",
     deleteConfirm: "Вы уверены, что хотите удалить эту транзакцию?",
     incomeIndicator: "Доход",
@@ -213,8 +214,5 @@ export const translations = {
     testConnection: "Проверить соединение",
     connectionSuccess: "Соединение успешно установлено",
     connectionFailed: "Ошибка соединения",
-  }
-};
-�динения",
   }
 };
