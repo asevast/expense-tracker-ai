@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useExpenses } from "@/app/context/ExpenseContext";
+import { useTranslation } from "@/app/context/LanguageContext";
 import { Modal } from "@/app/components/ui/Modal";
 import { Input } from "@/app/components/ui/Input";
 import { Select } from "@/app/components/ui/Select";
@@ -17,6 +18,7 @@ interface ExpenseFormProps {
 
 export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
   const { addExpense, updateExpense } = useExpenses();
+  const { language, t } = useTranslation();
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
     amount: "",
@@ -60,20 +62,20 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
     const newErrors: Record<string, string> = {};
 
     if (!formData.date) {
-      newErrors.date = "Date is required";
+      newErrors.date = t('errorDateRequired');
     }
 
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
-      newErrors.amount = "Amount must be a positive number";
+      newErrors.amount = t('errorAmountPositive');
     }
 
     if (!formData.category) {
-      newErrors.category = "Category is required";
+      newErrors.category = t('errorCategoryRequired');
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
+      newErrors.description = t('errorDescriptionRequired');
     }
 
     setErrors(newErrors);
@@ -126,22 +128,25 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={expense ? "Edit Expense" : "Add New Expense"}
+      title={expense ? t('editExpense') : t('addNewExpense')}
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2 sm:col-span-1">
             <Select
-              label="Type"
+              label={t('type')}
               value={formData.type}
               onChange={(e) => handleChange("type", e.target.value as TransactionType)}
-              options={TRANSACTION_TYPES.map((type) => ({ value: type.value, label: type.label }))}
+              options={TRANSACTION_TYPES.map((type) => ({ 
+                value: type.value, 
+                label: language === 'ru' ? type.labelRu : type.label 
+              }))}
             />
           </div>
           <div className="col-span-2 sm:col-span-1">
             <Select
-              label="Currency"
+              label={t('currency')}
               value={formData.currency}
               onChange={(e) => handleChange("currency", e.target.value as Currency)}
               options={CURRENCIES.map((curr) => ({ value: curr.value, label: curr.label }))}
@@ -151,14 +156,14 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
-            label="Date"
+            label={t('date')}
             type="date"
             value={formData.date}
             onChange={(e) => handleChange("date", e.target.value)}
             error={errors.date}
           />
           <Input
-            label="Amount"
+            label={t('amount')}
             type="number"
             step="0.01"
             min="0"
@@ -171,25 +176,28 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
 
         <div className="space-y-1">
           <Select
-            label="Category"
+            label={t('category')}
             value={formData.category}
             onChange={(e) => handleChange("category", e.target.value as Category)}
-            options={availableCategories.map((cat) => ({ value: cat.value, label: cat.label }))}
+            options={availableCategories.map((cat) => ({ 
+              value: cat.value, 
+              label: language === 'ru' ? cat.labelRu : cat.label 
+            }))}
             error={errors.category}
           />
           {(suggestion || isLoading) && (
             <div className="flex items-center gap-2 px-1 text-sm animate-in fade-in slide-in-from-top-1">
               {isLoading ? (
-                <span className="text-gray-500">AI is thinking...</span>
+                <span className="text-gray-500">{t('aiThinking')}</span>
               ) : suggestion ? (
                 <>
-                  <span className="text-gray-500">Suggested:</span>
+                  <span className="text-gray-500">{t('suggested')}:</span>
                   <button
                     type="button"
                     onClick={() => handleChange("category", suggestion)}
                     className="px-2 py-0.5 bg-primary/10 text-primary rounded-full border border-primary/20 hover:bg-primary/20 transition-colors text-xs font-medium"
                   >
-                    {suggestion}
+                    {language === 'ru' ? (CATEGORIES.find(c => c.value === suggestion)?.labelRu || suggestion) : suggestion}
                   </button>
                 </>
               ) : null}
@@ -198,19 +206,19 @@ export function ExpenseForm({ isOpen, onClose, expense }: ExpenseFormProps) {
         </div>
 
         <Input
-          label="Description"
+          label={t('description')}
           value={formData.description}
           onChange={(e) => handleChange("description", e.target.value)}
           error={errors.description}
-          placeholder="Enter description..."
+          placeholder={t('descriptionPlaceholder')}
         />
 
         <div className="flex gap-3 pt-4">
           <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
-            Cancel
+            {t('cancel')}
           </Button>
           <Button type="submit" className="flex-1">
-            {expense ? "Update" : "Add"} {expense ? (expense.type === "income" ? "Income" : "Expense") : "Transaction"}
+            {expense ? t('update') : t('add')} {expense ? (expense.type === "income" ? t('incomeType') : t('expenseType')) : t('transactionType')}
           </Button>
         </div>
       </form>

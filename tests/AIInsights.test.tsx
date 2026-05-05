@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AIInsights } from '@/app/components/Dashboard/AIInsights';
 import { useExpenses } from '@/app/context/ExpenseContext';
 import { useAIConfig } from '@/app/context/AIContext';
+import { LanguageProvider } from '@/app/context/LanguageContext';
 import { callAI } from '@/app/lib/ai-client';
 import React from 'react';
 
@@ -20,6 +21,14 @@ vi.mock('@/app/lib/ai-client', () => ({
 }));
 
 describe('AIInsights', () => {
+  const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+      <LanguageProvider>
+        {ui}
+      </LanguageProvider>
+    );
+  };
+
   const mockStats = {
     totalIncome: 5000,
     totalExpenses: 3000,
@@ -48,7 +57,7 @@ describe('AIInsights', () => {
   });
 
   it('renders correctly', () => {
-    render(<AIInsights />);
+    renderWithProviders(<AIInsights />);
     expect(screen.getByText('AI Insights')).toBeDefined();
     expect(screen.getByText(/Click the button to get AI-powered insights/i)).toBeDefined();
   });
@@ -56,7 +65,7 @@ describe('AIInsights', () => {
   it('calls callAI with correctly aggregated data when button is clicked', async () => {
     (callAI as any).mockResolvedValue({ content: 'Mocked insight' });
 
-    render(<AIInsights />);
+    renderWithProviders(<AIInsights />);
     const button = screen.getByText('Analyze Spending');
     fireEvent.click(button);
 
@@ -88,7 +97,7 @@ describe('AIInsights', () => {
       config: { enabled: false },
     });
 
-    render(<AIInsights />);
+    renderWithProviders(<AIInsights />);
     const button = screen.getByText('Analyze Spending');
     fireEvent.click(button);
 
@@ -99,7 +108,7 @@ describe('AIInsights', () => {
   it('handles API errors gracefully', async () => {
     (callAI as any).mockRejectedValue(new Error('API error'));
 
-    render(<AIInsights />);
+    renderWithProviders(<AIInsights />);
     const button = screen.getByText('Analyze Spending');
     fireEvent.click(button);
 
@@ -112,7 +121,7 @@ describe('AIInsights', () => {
     const bulletedResponse = "* Insight one\n- Insight two\n1. Insight three";
     (callAI as any).mockResolvedValue({ content: bulletedResponse });
 
-    render(<AIInsights />);
+    renderWithProviders(<AIInsights />);
     const button = screen.getByText('Analyze Spending');
     fireEvent.click(button);
 
@@ -144,7 +153,7 @@ describe('AIInsights', () => {
     });
     (callAI as any).mockResolvedValue({ content: 'Done' });
 
-    render(<AIInsights />);
+    renderWithProviders(<AIInsights />);
     fireEvent.click(screen.getByText('Analyze Spending'));
 
     await waitFor(() => {

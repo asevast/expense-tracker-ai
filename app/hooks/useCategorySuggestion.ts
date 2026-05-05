@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAIConfig } from "@/app/context/AIContext";
+import { useTranslation } from "@/app/context/LanguageContext";
 import { callAI } from "@/app/lib/ai-client";
 import { CATEGORIES, Category, TransactionType } from "@/app/types";
 
 export function useCategorySuggestion(description: string, type: TransactionType, currentCategory?: Category) {
   const { config } = useAIConfig();
+  const { language } = useTranslation();
   const [suggestion, setSuggestion] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -33,10 +35,13 @@ export function useCategorySuggestion(description: string, type: TransactionType
       if (!active) return;
       setIsLoading(true);
       try {
-        const availableCategories = CATEGORIES.filter(c => c.type === type).map(c => c.value);
-        const categoriesList = availableCategories.join(", ");
+        const categoriesOfType = CATEGORIES.filter(c => c.type === type);
+        const availableCategories = categoriesOfType.map(c => c.value);
+        const categoriesWithLabels = categoriesOfType.map(c => 
+          `${c.value} (${language === 'ru' ? c.labelRu : c.label})`
+        ).join(", ");
 
-        const systemPrompt = `You are a professional financial assistant. Categorize the given description into exactly one of these categories: [${categoriesList}]. Return ONLY the category name.`;
+        const systemPrompt = `You are a professional financial assistant. The user's language is ${language === 'ru' ? 'Russian' : 'English'}. Categorize the given description into exactly one of these categories: [${categoriesWithLabels}]. Return ONLY the category key (the part before the parenthesis).`;
         
         const { content } = await callAI(config, [
           { role: "system", content: systemPrompt },
@@ -81,7 +86,7 @@ export function useCategorySuggestion(description: string, type: TransactionType
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [description, type, config, currentCategory]);
+  }, [description, type, config, currentCategory, language]);
 
   return { suggestion, isLoading };
 }

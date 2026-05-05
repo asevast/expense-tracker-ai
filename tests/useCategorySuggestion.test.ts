@@ -2,11 +2,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCategorySuggestion } from '@/app/hooks/useCategorySuggestion';
 import { useAIConfig } from '@/app/context/AIContext';
+import { useTranslation } from '@/app/context/LanguageContext';
 import { callAI } from '@/app/lib/ai-client';
 
 // Mock the AI Context
 vi.mock('@/app/context/AIContext', () => ({
   useAIConfig: vi.fn(),
+}));
+
+// Mock the Language Context
+vi.mock('@/app/context/LanguageContext', () => ({
+  useTranslation: vi.fn(),
 }));
 
 // Mock the AI client
@@ -26,6 +32,7 @@ describe('useCategorySuggestion', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     (useAIConfig as any).mockReturnValue({ config: mockConfig });
+    (useTranslation as any).mockReturnValue({ language: 'en', t: (k: string) => k });
     vi.clearAllMocks();
   });
 

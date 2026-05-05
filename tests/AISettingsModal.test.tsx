@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AISettingsModal } from '@/app/components/Settings/AISettingsModal';
 import { useAIConfig } from '@/app/context/AIContext';
+import { LanguageProvider } from '@/app/context/LanguageContext';
 import { callAI } from '@/app/lib/ai-client';
 import React from 'react';
 
@@ -15,6 +16,14 @@ vi.mock('@/app/lib/ai-client', () => ({
 }));
 
 describe('AISettingsModal', () => {
+  const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+      <LanguageProvider>
+        {ui}
+      </LanguageProvider>
+    );
+  };
+
   const mockUpdateConfig = vi.fn();
   const mockOnClose = vi.fn();
   const mockConfig = {
@@ -34,23 +43,23 @@ describe('AISettingsModal', () => {
   });
 
   it('renders correctly when open', () => {
-    render(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProviders(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
     
     expect(screen.getByText('AI Settings')).toBeDefined();
     expect(screen.getByLabelText('Enable AI Features')).toBeDefined();
     expect(screen.getByLabelText('AI Provider')).toBeDefined();
     expect(screen.getByLabelText('API Key')).toBeDefined();
     expect(screen.getByLabelText('Model ID')).toBeDefined();
-    expect(screen.getByText('Save Changes')).toBeDefined();
+    expect(screen.getByText('Save')).toBeDefined();
   });
 
   it('updates local state and calls updateConfig on save', () => {
-    render(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProviders(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
     
     const apiKeyInput = screen.getByLabelText('API Key');
     fireEvent.change(apiKeyInput, { target: { value: 'new-api-key' } });
     
-    const saveButton = screen.getByText('Save Changes');
+    const saveButton = screen.getByText('Save');
     fireEvent.click(saveButton);
     
     expect(mockUpdateConfig).toHaveBeenCalledWith(expect.objectContaining({
@@ -60,7 +69,7 @@ describe('AISettingsModal', () => {
   });
 
   it('updates provider and defaults when provider changes', () => {
-    render(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProviders(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
     
     const providerSelect = screen.getByLabelText('AI Provider');
     fireEvent.change(providerSelect, { target: { value: 'anthropic' } });
@@ -76,7 +85,7 @@ describe('AISettingsModal', () => {
       content: 'Success'
     });
 
-    render(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProviders(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
     
     const apiKeyInput = screen.getByLabelText('API Key');
     fireEvent.change(apiKeyInput, { target: { value: 'test-key' } });
@@ -94,7 +103,7 @@ describe('AISettingsModal', () => {
   it('handles test connection failure', async () => {
     (callAI as any).mockRejectedValueOnce(new Error('Invalid API Key'));
 
-    render(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProviders(<AISettingsModal isOpen={true} onClose={mockOnClose} />);
     
     const apiKeyInput = screen.getByLabelText('API Key');
     fireEvent.change(apiKeyInput, { target: { value: 'invalid-key' } });

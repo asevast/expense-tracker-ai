@@ -10,6 +10,8 @@ import { AIProviderType, AIConfig } from "@/app/types";
 import { callAI } from "@/app/lib/ai-client";
 import { Check, Loader2, AlertCircle } from "lucide-react";
 
+import { useTranslation } from "@/app/context/LanguageContext";
+
 interface AISettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,6 +40,7 @@ const DEFAULT_MODELS: Record<AIProviderType, string> = {
 
 export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
   const { config, updateConfig } = useAIConfig();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<AIConfig>(config);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
@@ -80,12 +83,12 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
       
       setTestResult({
         success: true,
-        message: `Connection successful: ${response.content}`,
+        message: `${t('connectionSuccess')}: ${response.content}`,
       });
     } catch (error: any) {
       setTestResult({
         success: false,
-        message: error.message || "Connection failed",
+        message: error.message || t('connectionFailed'),
       });
     } finally {
       setIsTesting(false);
@@ -95,7 +98,7 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
   const showBaseUrl = formData.provider !== "anthropic";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="AI Settings" size="md">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('aiSettings')} size="md">
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <input
@@ -106,12 +109,12 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
             className="h-4 w-4 rounded border-primary-300 text-primary-600 focus:ring-primary-600"
           />
           <label htmlFor="ai-enabled" className="text-sm font-medium text-primary-900">
-            Enable AI Features
+            {t('enableAI')}
           </label>
         </div>
 
         <Select
-          label="AI Provider"
+          label={t('aiProvider')}
           options={PROVIDER_OPTIONS}
           value={formData.provider}
           onChange={(e) => handleChange("provider", e.target.value as AIProviderType)}
@@ -119,7 +122,7 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
 
         {showBaseUrl && (
           <Input
-            label="API Base URL"
+            label={t('apiBaseUrl')}
             value={formData.baseUrl}
             onChange={(e) => handleChange("baseUrl", e.target.value)}
             placeholder="https://api.openai.com/v1"
@@ -127,7 +130,7 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
         )}
 
         <Input
-          label="API Key"
+          label={t('apiKey')}
           type="password"
           value={formData.apiKey}
           onChange={(e) => handleChange("apiKey", e.target.value)}
@@ -135,7 +138,7 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
         />
 
         <Input
-          label="Model ID"
+          label={t('modelId')}
           value={formData.modelId}
           onChange={(e) => handleChange("modelId", e.target.value)}
           placeholder="gpt-4o-mini"
@@ -164,9 +167,9 @@ export function AISettingsModal({ isOpen, onClose }: AISettingsModalProps) {
             className="gap-2"
           >
             {isTesting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Test Connection
+            {t('testConnection')}
           </Button>
-          <Button onClick={handleSave}>Save Changes</Button>
+          <Button onClick={handleSave}>{t('save')}</Button>
         </div>
       </div>
     </Modal>

@@ -1,0 +1,49 @@
+<h2>Multi-Language Support (RU/EN)</h2>
+<p class="subtitle">Switch between Russian and English with a toggle</p>
+
+<div class="mockup">
+  <div class="mockup-header">Header > Settings</div>
+  <div class="mockup-body">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #eee;">
+      <h3 style="margin:0">Dashboard</h3>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <!-- Language Toggle -->
+        <div style="display: flex; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+          <button style="padding: 4px 10px; border: none; background: #f3f4f6; cursor: pointer; font-weight: bold;">EN</button>
+          <button style="padding: 4px 10px; border: none; background: #fff; cursor: pointer;">RU</button>
+        </div>
+        <button class="mock-button" style="padding: 4px 8px;">Settings</button>
+      </div>
+    </div>
+    
+    <div style="padding: 20px;">
+      <h4 style="margin-top:0">Monthly Summary / Месячный отчет</h4>
+      <div class="split">
+        <div class="card"><div class="card-body"><h5>Total Income</h5><p>$5,000</p></div></div>
+        <div class="card"><div class="card-body"><h5>Total Expenses</h5><p>$3,200</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>Implementation Strategy: "i18n-lite"</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Approach</h4>
+      <ul>
+        <li><strong>LanguageContext</strong>: Store current locale (<code>'en'</code> or <code>'ru'</code>) in a new context, persisted to <code>localStorage</code>.</li>
+        <li><strong>Translation Map</strong>: A simple dictionary <code>{ en: { hello: 'Hello' }, ru: { hello: 'Привет' } }</code>.</li>
+        <li><strong>Formatting</strong>: Update <code>formatCurrency</code> and <code>formatDate</code> to respect the active language automatically.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Scope</h4>
+      <ul>
+        <li><strong>Static UI</strong>: All buttons, labels, and titles will be translated.</li>
+        <li><strong>Dynamic Content</strong>: AI insights and category suggestions will be requested in the user's active language.</li>
+        <li><strong>Categories</strong>: We can provide translated labels for the <code>CATEGORIES</code> constants.</li>
+      </ul>
+    </div>
+  </div>
+</div>

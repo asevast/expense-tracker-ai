@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useExpenses } from "@/app/context/ExpenseContext";
+import { useTranslation } from "@/app/context/LanguageContext";
 import { Modal } from "@/app/components/ui/Modal";
 import { Input } from "@/app/components/ui/Input";
 import { Button } from "@/app/components/ui/Button";
@@ -21,6 +22,7 @@ type ExportFormat = "csv" | "json" | "pdf";
 
 export function ExportModal({ isOpen, onClose }: ExportModalProps) {
   const { expenses } = useExpenses();
+  const { t, language } = useTranslation();
 
   const [format, setFormat] = useState<ExportFormat>("csv");
   const [startDate, setStartDate] = useState("");
@@ -67,17 +69,29 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
     setSelectedCategories([]);
   };
 
+  const getCategoryLabel = (catValue: string) => {
+    const cat = CATEGORIES.find(c => c.value === catValue);
+    if (!cat) return catValue;
+    return language === 'ru' ? cat.labelRu : cat.label;
+  };
+
+  const getTypeLabel = (typeValue: string) => {
+    if (typeValue === 'income') return t('incomeIndicator');
+    if (typeValue === 'expense') return t('expenseIndicator');
+    return typeValue;
+  };
+
   const exportToCSV = (data: Expense[]) => {
-    const headers = ["Date", "Type", "Category", "Currency", "Amount", "Description"];
+    const headers = [t('date'), t('type'), t('category'), t('currency'), t('amount'), t('description')];
     const rows = data.map((expense) => [
       expense.date,
-      expense.type,
-      expense.category,
+      getTypeLabel(expense.type),
+      getCategoryLabel(expense.category),
       expense.currency,
       expense.amount.toFixed(2),
       `"${expense.description.replace(/"/g, '""')}"`,
     ]);
-    const csvContent = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    const csvContent = "\uFEFF" + [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -101,24 +115,24 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
   const exportToPDF = async (data: Expense[]) => {
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text("Expense Report", 14, 22);
+    doc.text(t('exportData'), 14, 22);
 
     const totalAmount = data.reduce((sum, exp) => sum + exp.amount, 0);
     doc.setFontSize(10);
-    doc.text(`Total Records: ${data.length}`, 14, 30);
-    doc.text(`Total Amount: ${formatCurrency(totalAmount, "USD")}`, 14, 36);
+    doc.text(`${t('recordsToExport')}: ${data.length}`, 14, 30);
+    doc.text(`${t('total')}: ${formatCurrency(totalAmount, "USD", language)}`, 14, 36);
 
     const tableData = data.map((expense) => [
       expense.date,
-      expense.type,
-      expense.category,
+      getTypeLabel(expense.type),
+      getCategoryLabel(expense.category),
       expense.currency,
       expense.amount.toFixed(2),
       expense.description.substring(0, 30) + (expense.description.length > 30 ? "..." : ""),
     ]);
 
     (doc as any).autoTable({
-      head: [["Date", "Type", "Category", "Currency", "Amount", "Description"]],
+      head: [[t('date'), t('type'), t('category'), t('currency'), t('amount'), t('description')]],
       body: tableData,
       startY: 45,
       theme: "grid",
@@ -130,7 +144,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
 
   const handleExport = async () => {
     if (filteredExpenses.length === 0) {
-      alert("No expenses match the selected criteria");
+      alert(t('noExpensesSelected'));
       return;
     }
 
@@ -148,7 +162,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
       onClose();
     } catch (error) {
       console.error("Export failed:", error);
-      alert("Export failed. Please try again.");
+      alert(t('exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -168,10 +182,10 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Export Data" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('exportData')} size="lg">
       <div className="space-y-6">
         <div>
-          <label className="mb-2 block text-sm font-medium text-primary-700">Export Format</label>
+          <label className="mb-2 block text-sm font-medium text-primary-700">{t('exportFormat')}</label>
           <div className="grid grid-cols-3 gap-3">
             {(["csv", "json", "pdf"] as const).map((f) => (
               <button
@@ -196,7 +210,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm font-medium text-primary-700">Start Date (optional)</label>
+            <label className="mb-2 block text-sm font-medium text-primary-700">{t('startDateOptional')}</label>
             <Input
               type="date"
               value={startDate}
@@ -205,7 +219,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
             />
           </div>
           <div>
-            <label className="mb-2 block text-sm font-medium text-primary-700">End Date (optional)</label>
+            <label className="mb-2 block text-sm font-medium text-primary-700">{t('endDateOptional')}</label>
             <Input
               type="date"
               value={endDate}
@@ -217,21 +231,21 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
 
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <label className="text-sm font-medium text-primary-700">Categories</label>
+            <label className="text-sm font-medium text-primary-700">{t('category')}</label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={selectAllCategories}
                 className="text-xs text-primary-600 hover:text-primary-800"
               >
-                Select All
+                {t('selectAll')}
               </button>
               <button
                 type="button"
                 onClick={clearAllCategories}
                 className="text-xs text-primary-600 hover:text-primary-800"
               >
-                Clear All
+                {t('clearAll')}
               </button>
             </div>
           </div>
@@ -247,30 +261,30 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
                   onChange={() => toggleCategory(category.value)}
                   className="rounded border-primary-300 text-primary-600 focus:ring-primary-500"
                 />
-                <span>{category.label}</span>
+                <span>{language === 'ru' ? category.labelRu : category.label}</span>
               </label>
             ))}
           </div>
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-primary-700">Filename (without extension)</label>
+          <label className="mb-2 block text-sm font-medium text-primary-700">{t('filenameLabel')}</label>
           <Input
             type="text"
             value={filename}
             onChange={(e) => setFilename(e.target.value.replace(/[^a-z0-9_-]/gi, ""))}
-            placeholder="Enter filename"
+            placeholder={t('filenamePlaceholder')}
           />
         </div>
 
         <Card padding="md" className="bg-primary-50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-primary-600">Records to export</p>
+              <p className="text-sm text-primary-600">{t('recordsToExport')}</p>
               <p className="text-2xl font-bold text-primary-900">{totalCount}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-primary-600">Format</p>
+              <p className="text-sm text-primary-600">{t('exportFormat')}</p>
               <div className="flex items-center gap-2 text-lg font-semibold text-primary-900">
                 {getFormatIcon()}
                 <span>{format.toUpperCase()}</span>
@@ -282,26 +296,26 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
         {previewData.length > 0 && (
           <div>
             <label className="mb-2 block text-sm font-medium text-primary-700">
-              Preview (first {previewData.length} of {totalCount} records)
+              {t('previewLabel').replace('{count}', previewData.length.toString()).replace('{total}', totalCount.toString())}
             </label>
             <div className="overflow-x-auto rounded-md border border-primary-200">
               <table className="min-w-full divide-y divide-primary-200">
                 <thead className="bg-primary-50">
                   <tr>
                     <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-primary-600">
-                      Date
+                      {t('date')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-primary-600">
-                      Type
+                      {t('type')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-primary-600">
-                      Category
+                      {t('category')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-primary-600">
-                      Amount
+                      {t('amount')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-primary-600">
-                      Description
+                      {t('description')}
                     </th>
                   </tr>
                 </thead>
@@ -317,12 +331,12 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
                               : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {expense.type}
+                          {getTypeLabel(expense.type)}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-sm text-primary-900">{expense.category}</td>
+                      <td className="px-4 py-2 text-sm text-primary-900">{getCategoryLabel(expense.category)}</td>
                       <td className="px-4 py-2 text-sm font-medium text-primary-900">
-                        {formatCurrency(expense.amount, expense.currency)}
+                        {formatCurrency(expense.amount, expense.currency, language)}
                       </td>
                       <td className="px-4 py-2 text-sm text-primary-600 truncate max-w-xs">
                         {expense.description}
@@ -337,7 +351,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
 
         <div className="flex justify-end gap-3 border-t border-primary-200 pt-4">
           <Button variant="secondary" onClick={onClose} disabled={isExporting}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleExport}
@@ -347,12 +361,12 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
             {isExporting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Exporting...
+                {t('exporting')}
               </>
             ) : (
               <>
                 <Download className="h-4 w-4" />
-                Export {totalCount} records
+                {t('exportButton').replace('{count}', totalCount.toString())}
               </>
             )}
           </Button>

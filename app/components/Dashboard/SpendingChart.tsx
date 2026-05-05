@@ -3,25 +3,27 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card } from "@/app/components/ui/Card";
 import { useExpenses } from "@/app/context/ExpenseContext";
+import { useTranslation } from "@/app/context/LanguageContext";
 import { formatCurrency, formatMonthYear } from "@/app/lib/utils";
 
 export function SpendingChart() {
   const { getDashboardStats } = useExpenses();
+  const { language, t } = useTranslation();
   const { monthlyData } = getDashboardStats();
 
   const chartData = monthlyData.map((item) => ({
     ...item,
-    formattedMonth: formatMonthYear(item.month),
-    formattedIncome: formatCurrency(item.income),
-    formattedExpenses: formatCurrency(item.expenses),
+    formattedMonth: formatMonthYear(item.month, language),
+    formattedIncome: formatCurrency(item.income, "USD", language),
+    formattedExpenses: formatCurrency(item.expenses, "USD", language),
   }));
 
   return (
     <Card className="h-80">
-      <h3 className="text-lg font-semibold text-primary-900 mb-4">Monthly Overview</h3>
+      <h3 className="text-lg font-semibold text-primary-900 mb-4">{t('monthlyOverview')}</h3>
       {chartData.length === 0 ? (
         <div className="flex h-64 items-center justify-center text-primary-500">
-          No data to display
+          {t('noData')}
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={250}>
@@ -37,7 +39,7 @@ export function SpendingChart() {
               tick={{ fontSize: 12 }}
               tickLine={{ stroke: "#94a3b8" }}
               axisLine={{ stroke: "#94a3b8" }}
-              tickFormatter={(value) => `$${value / 1000}k`}
+              tickFormatter={(value) => `${language === 'ru' ? '' : '$'}${value / 1000}k${language === 'ru' ? ' ₽' : ''}`}
             />
             <Tooltip
               contentStyle={{
@@ -47,8 +49,8 @@ export function SpendingChart() {
                 fontSize: "14px",
               }}
             />
-            <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} name="Income" />
-            <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
+            <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} name={t('income')} />
+            <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name={t('expenses')} />
           </BarChart>
         </ResponsiveContainer>
       )}

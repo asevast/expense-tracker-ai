@@ -1,6 +1,7 @@
 "use client";
 
 import { useExpenses } from "@/app/context/ExpenseContext";
+import { useTranslation } from "@/app/context/LanguageContext";
 import { CATEGORIES, TRANSACTION_TYPES, CURRENCIES } from "@/app/types";
 import { Input } from "@/app/components/ui/Input";
 import { Select } from "@/app/components/ui/Select";
@@ -10,6 +11,8 @@ import { downloadCSV } from "@/app/lib/csv";
 
 export function FilterBar() {
   const { filters, setFilters, resetFilters, getFilteredExpenses } = useExpenses();
+  const { language, t } = useTranslation();
+  
   const hasActiveFilters =
     filters.searchQuery ||
     filters.typeFilter !== "all" ||
@@ -21,7 +24,7 @@ export function FilterBar() {
   const handleExportCSV = () => {
     const expenses = getFilteredExpenses();
     if (expenses.length === 0) {
-      alert("No expenses to export");
+      alert(t('noExpensesToExport'));
       return;
     }
     downloadCSV(expenses);
@@ -36,8 +39,11 @@ export function FilterBar() {
               value={filters.typeFilter}
               onChange={(e) => setFilters({ typeFilter: e.target.value as typeof filters.typeFilter })}
               options={[
-                { value: "all", label: "All Types" },
-                ...TRANSACTION_TYPES.map((type) => ({ value: type.value, label: type.label })),
+                { value: "all", label: t('allTypes') },
+                ...TRANSACTION_TYPES.map((type) => ({ 
+                  value: type.value, 
+                  label: language === 'ru' ? type.labelRu : type.label 
+                })),
               ]}
             />
           </div>
@@ -47,7 +53,7 @@ export function FilterBar() {
               value={filters.currencyFilter}
               onChange={(e) => setFilters({ currencyFilter: e.target.value as typeof filters.currencyFilter })}
               options={[
-                { value: "all", label: "All Currencies" },
+                { value: "all", label: t('allCurrencies') },
                 ...CURRENCIES.map((curr) => ({ value: curr.value, label: curr.label })),
               ]}
             />
@@ -58,7 +64,7 @@ export function FilterBar() {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-400" />
               <input
                 type="text"
-                placeholder="Search expenses..."
+                placeholder={t('searchPlaceholder')}
                 value={filters.searchQuery}
                 onChange={(e) => setFilters({ searchQuery: e.target.value })}
                 className="w-full rounded-md border border-primary-300 pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
@@ -71,8 +77,11 @@ export function FilterBar() {
               value={filters.categoryFilter}
               onChange={(e) => setFilters({ categoryFilter: e.target.value as typeof filters.categoryFilter })}
               options={[
-                { value: "all", label: "All Categories" },
-                ...CATEGORIES.map((cat) => ({ value: cat.value, label: cat.label })),
+                { value: "all", label: t('allCategories') },
+                ...CATEGORIES.map((cat) => ({ 
+                  value: cat.value, 
+                  label: language === 'ru' ? cat.labelRu : cat.label 
+                })),
               ]}
             />
           </div>
@@ -82,7 +91,7 @@ export function FilterBar() {
               type="date"
               value={filters.startDate}
               onChange={(e) => setFilters({ startDate: e.target.value })}
-              placeholder="Start date"
+              placeholder={t('startDate')}
             />
           </div>
 
@@ -91,7 +100,7 @@ export function FilterBar() {
               type="date"
               value={filters.endDate}
               onChange={(e) => setFilters({ endDate: e.target.value })}
-              placeholder="End date"
+              placeholder={t('endDate')}
             />
           </div>
         </div>
@@ -105,46 +114,50 @@ export function FilterBar() {
             className="gap-2"
           >
             <X className="h-4 w-4" />
-            Clear Filters
+            {t('clearFilters')}
           </Button>
           <Button variant="secondary" size="sm" onClick={handleExportCSV} className="gap-2">
             <Download className="h-4 w-4" />
-            Export CSV
+            {t('exportCSV')}
           </Button>
         </div>
       </div>
 
       {hasActiveFilters && (
         <div className="flex items-center gap-2 text-sm text-primary-600 flex-wrap">
-          <span className="font-medium">Active filters:</span>
+          <span className="font-medium">{t('activeFilters')}:</span>
           {filters.typeFilter !== "all" && (
             <span className="rounded-full bg-primary-100 px-3 py-1">
-              Type: {filters.typeFilter}
+              {t('filterType')}: {
+                TRANSACTION_TYPES.find(t => t.value === filters.typeFilter)?.[language === 'ru' ? 'labelRu' : 'label'] || filters.typeFilter
+              }
             </span>
           )}
           {filters.currencyFilter !== "all" && (
             <span className="rounded-full bg-primary-100 px-3 py-1">
-              Currency: {filters.currencyFilter}
+              {t('filterCurrency')}: {filters.currencyFilter}
             </span>
           )}
           {filters.searchQuery && (
             <span className="rounded-full bg-primary-100 px-3 py-1">
-              Search: {filters.searchQuery}
+              {t('filterSearch')}: {filters.searchQuery}
             </span>
           )}
           {filters.categoryFilter !== "all" && (
             <span className="rounded-full bg-primary-100 px-3 py-1">
-              Category: {filters.categoryFilter}
+              {t('filterCategory')}: {
+                CATEGORIES.find(c => c.value === filters.categoryFilter)?.[language === 'ru' ? 'labelRu' : 'label'] || filters.categoryFilter
+              }
             </span>
           )}
           {filters.startDate && (
             <span className="rounded-full bg-primary-100 px-3 py-1">
-              From: {filters.startDate}
+              {t('filterFrom')}: {filters.startDate}
             </span>
           )}
           {filters.endDate && (
             <span className="rounded-full bg-primary-100 px-3 py-1">
-              To: {filters.endDate}
+              {t('filterTo')}: {filters.endDate}
             </span>
           )}
         </div>
