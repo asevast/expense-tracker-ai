@@ -12,6 +12,8 @@ export const CURRENCIES = [
 
 export type Currency = (typeof CURRENCIES)[number]["value"];
 
+export type Language = 'en' | 'ru';
+
 export const CATEGORIES = [
   // Income categories
   { value: "Salary", label: "Salary", color: "#10b981", type: "income" as TransactionType },
